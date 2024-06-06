@@ -1,20 +1,17 @@
-// Function to handle login
-function login() {
-    const playerName = document.getElementById('player-name').value;
-    if (playerName) {
-        localStorage.setItem('playerName', playerName);
-        window.location.href = 'app.html';
-    }
-}
-
 // Initialize players from local storage or as an empty array
 let players = JSON.parse(localStorage.getItem('players')) || [];
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || { username: 'TestUser', points: 100 }; // Mock user for testing
+
+// Save currentUser to local storage if not already present
+if (!localStorage.getItem('currentUser')) {
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+}
 
 // Function to add a player to the scoreboard
 function addPlayer() {
     const playerName = document.getElementById('player-name').value;
     if (playerName) {
-        players.push({ name: playerName, scoreBounties: 0, scorePeerAward: 0, scoreMemelord: 0 });
+        players.push({ name: playerName, totalPoints: 0, scoreBounties: 0, scorePeerAward: 0, scoreMemelord: 0 });
         localStorage.setItem('players', JSON.stringify(players));
         document.getElementById('player-name').value = '';
         updateScoreboard();
@@ -28,10 +25,11 @@ function updateScoreboard() {
     scoreboard.innerHTML = '';
 
     // Sort players by total score (sum of all categories) in descending order
-    players.sort((a, b) => (b.scoreBounties + b.scorePeerAward + b.scoreMemelord) - (a.scoreBounties + a.scorePeerAward + a.scoreMemelord));
+    players.sort((a, b) => b.totalPoints - a.totalPoints);
 
     players.forEach((player) => {
         const totalScore = player.scoreBounties + player.scorePeerAward + player.scoreMemelord;
+        player.totalPoints = totalScore; // Update the total points
         const playerElement = document.createElement('div');
         playerElement.classList.add('player');
 
@@ -48,6 +46,13 @@ function updateScoreboard() {
     });
 
     localStorage.setItem('players', JSON.stringify(players));
+    displayUserPoints(); // Display user points
+}
+
+// Function to display the current user's points
+function displayUserPoints() {
+    const userPointsElement = document.getElementById('user-points');
+    userPointsElement.innerHTML = `Current User Points: ${currentUser.points}`;
 }
 
 // Function to update the point control buttons
@@ -81,6 +86,8 @@ function updatePointControls() {
 // Function to increment a player's score
 function incrementScore(index, category) {
     players[index][category]++;
+    updatePlayerTotalPoints(index); // Update the player's total points
+    localStorage.setItem('players', JSON.stringify(players));
     updateScoreboard();
     updatePointControls();
 }
@@ -88,12 +95,22 @@ function incrementScore(index, category) {
 // Function to decrement a player's score
 function decrementScore(index, category) {
     players[index][category]--;
+    updatePlayerTotalPoints(index); // Update the player's total points
+    localStorage.setItem('players', JSON.stringify(players));
     updateScoreboard();
     updatePointControls();
 }
 
-// On page load, update the scoreboard and point controls if on the app page
+// Function to update a player's total points
+function updatePlayerTotalPoints(index) {
+    const player = players[index];
+    player.totalPoints = player.scoreBounties + player.scorePeerAward + player.scoreMemelord;
+    localStorage.setItem('players', JSON.stringify(players));
+}
+
+// On page load, update the scoreboard, point controls, and display user points if on the app page
 if (document.getElementById('scoreboard')) {
     updateScoreboard();
     updatePointControls();
+    displayUserPoints(); // Display user points
 }

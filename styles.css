@@ -6,11 +6,29 @@
 body {
     font-family: 'Fira Sans', sans-serif;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    height: 100vh;
     margin: 0;
     background-color: #E5006D; /* Pink page background */
+}
+
+.banner {
+    width: 100%;
+    background-color: #010D09; /* Dark background */
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.banner a {
+    color: #44C29C; /* Green text color */
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 18px;
+}
+
+.banner a:hover {
+    color: #0E5E46; /* Darker green hover color */
 }
 
 .container {
@@ -21,11 +39,7 @@ body {
     width: 300px;
     text-align: center;
     color: #44C29C; /* Green text color */
-}
-
-.main-content {
-    display: flex;
-    align-items: flex-start;
+    margin-top: 20px;
 }
 
 h1 {
@@ -47,23 +61,12 @@ a {
     margin-bottom: 20px;
 }
 
-#scoreboard {
-    margin-bottom: 20px;
-    height: 70vh;
-    overflow-y: scroll; /* Scrollbar on the right */
-    width: 50%;
-}
-
-.player {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: calc(100% - 22px);
     margin-bottom: 10px;
-    color: #44C29C; /* Green font color for player names */
-}
-
-.player span {
-    font-weight: bold; /* Bold player names */
 }
 
 button {
@@ -79,65 +82,30 @@ button:hover {
     background-color: #0E5E46; /* Darker green hover color */
 }
 
-input {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: calc(100% - 22px);
-    margin-bottom: 10px;
-}
-
-/* Custom scrollbar */
-#scoreboard::-webkit-scrollbar {
-    width: 12px;
-}
-
-#scoreboard::-webkit-scrollbar-track {
-    background: #010D09; /* Dark background */
-    border-radius: 6px;
-}
-
-#scoreboard::-webkit-scrollbar-thumb {
-    background: #44C29C; /* Green scrollbar */
-    border-radius: 6px;
-}
-
-#scoreboard::-webkit-scrollbar-thumb:hover {
-    background: #0E5E46; /* Darker green hover color */
-}
-
-.point-controls {
-    margin-left: 20px;
-    width: 50%;
-}
-
-.point-controls .player-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    color: #44C29C; /* Green font color for player names */
-}
-
-.player-controls span {
-    margin-right: 10px;
-}
-
-.player-controls button {
-    margin-left: 5px;
-}
-
 .bounty {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     margin-bottom: 10px;
     background-color: #0E5E46; /* Darker green background for bounties */
     padding: 10px;
     border-radius: 5px;
     color: #fff; /* White text color */
+    width: 100%;
 }
 
-.bounty span {
-    margin-right: 10px;
+.bounty .bounty-controls {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.bounty .signed-up-users {
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.signed-up-users span {
+    display: block;
+    margin-bottom: 5px;
 }
