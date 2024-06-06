@@ -1,143 +1,64 @@
-@font-face {
-    font-family: 'Baskerville';
-    src: local('Baskerville'), local('Baskerville Regular');
-}
-
 body {
     font-family: 'Fira Sans', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    background-color: #E5006D;
     margin: 0;
-    background-color: #E5006D; /* Pink page background */
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.banner {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.banner a {
+    color: #44C29C;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+    font-size: 1.2em;
 }
 
 .container {
-    background-color: #010D09; /* Dark container background */
+    background-color: #010D09;
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 300px;
+    border-radius: 10px;
     text-align: center;
-    color: #44C29C; /* Green text color */
+    color: #44C29C;
 }
 
-.main-content {
-    display: flex;
-    align-items: flex-start;
-}
-
-h1 {
-    font-family: 'Fira Sans', sans-serif;
-    margin: 0 0 20px;
-    color: #44C29C; /* Green text color */
-}
-
-a {
-    color: #44C29C; /* Green link color */
-    text-decoration: none;
-    margin-bottom: 20px;
-    display: block;
-}
-
-.controls {
-    font-family: 'Baskerville', serif;
-    color: #0E5E46;
-    margin-bottom: 20px;
-}
-
-#scoreboard {
-    margin-bottom: 20px;
-    height: 70vh;
-    overflow-y: scroll; /* Scrollbar on the right */
-    width: 50%;
-}
-
-.player {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+#scoreboard .player {
     margin-bottom: 10px;
-    color: #44C29C; /* Green font color for player names */
 }
 
-.player span {
-    font-weight: bold; /* Bold player names */
+.player-controls {
+    margin-bottom: 10px;
 }
 
-button {
-    cursor: pointer;
-    background-color: #44C29C; /* Green button color */
-    color: #fff;
+.controls input, .controls button {
+    margin: 10px 0;
+}
+
+.controls input {
+    padding: 10px;
+    border-radius: 5px;
     border: none;
+}
+
+.controls button {
     padding: 10px;
     border-radius: 5px;
+    border: none;
+    background-color: #44C29C;
+    color: #010D09;
+    cursor: pointer;
 }
 
-button:hover {
-    background-color: #0E5E46; /* Darker green hover color */
-}
-
-input {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: calc(100% - 22px);
-    margin-bottom: 10px;
-}
-
-/* Custom scrollbar */
-#scoreboard::-webkit-scrollbar {
-    width: 12px;
-}
-
-#scoreboard::-webkit-scrollbar-track {
-    background: #010D09; /* Dark background */
-    border-radius: 6px;
-}
-
-#scoreboard::-webkit-scrollbar-thumb {
-    background: #44C29C; /* Green scrollbar */
-    border-radius: 6px;
-}
-
-#scoreboard::-webkit-scrollbar-thumb:hover {
-    background: #0E5E46; /* Darker green hover color */
-}
-
-.point-controls {
-    margin-left: 20px;
-    width: 50%;
-}
-
-.point-controls .player-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    color: #44C29C; /* Green font color for player names */
-}
-
-.player-controls span {
-    margin-right: 10px;
-}
-
-.player-controls button {
-    margin-left: 5px;
-}
-
-.bounty {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    background-color: #0E5E46; /* Darker green background for bounties */
-    padding: 10px;
-    border-radius: 5px;
-    color: #fff; /* White text color */
-}
-
-.bounty span {
-    margin-right: 10px;
+.controls button:hover {
+    background-color: #379982;
 }
