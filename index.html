@@ -3,18 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>MGC</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="banner">
         <a href="index.html">Home</a>
+        <a href="announcements.html">Announcements</a>
+        <a href="deadpool.html">Deadpool</a>
         <a href="bounty-board.html">Bounty Board</a>
-        <a href="app.html">Deadpool</a>
     </div>
-    <div class="container">
-        <h1>Welcome to the Deadpool App</h1>
-        <p><a href="login.html">Login</a> or <a href="signup.html">Sign Up</a> to get started!</p>
+    <div class="container cyoa-container">
+        <div id="cyoa-stage" class="cyoa-stage"></div>
     </div>
+
+    <script>
+        const stages = {
+            start: {
+                text: "You push open the heavy door to MGC headquarters. The room buzzes with activity. A neon sign flickers overhead: <em>\"Welcome to MGC.\"</em> Where do you head first?",
+                choices: [
+                    { label: "🏆 The scoreboard room", next: "deadpool_path" },
+                    { label: "📋 The bounty board", next: "bounty_path" },
+                    { label: "📢 The announcement board", next: null, href: "announcements.html" }
+                ]
+            },
+            deadpool_path: {
+                text: "You step into the dimly lit scoreboard room. Names and points glow on the screen. The air smells of competition and snacks. A voice from the shadows says: <em>\"You ready to play the Deadpool?\"</em>",
+                choices: [
+                    { label: "😤 I was born ready.", next: null, href: "deadpool.html" },
+                    { label: "💰 Actually, I'll check the bounties first.", next: null, href: "bounty-board.html" }
+                ]
+            },
+            bounty_path: {
+                text: "The bounty board towers before you, plastered with challenges and glittering rewards. Your eyes light up with possibility. A grizzled veteran leans over: <em>\"See anything worth chasing?\"</em>",
+                choices: [
+                    { label: "👀 Let's see what's available.", next: null, href: "bounty-board.html" },
+                    { label: "🎯 Actually, show me the Deadpool.", next: null, href: "deadpool.html" }
+                ]
+            }
+        };
+
+        function renderStage(stageKey) {
+            const stage = stages[stageKey];
+            const container = document.getElementById('cyoa-stage');
+
+            const choicesHTML = stage.choices.map(choice => {
+                if (choice.href) {
+                    return `<a class="cyoa-btn" href="${choice.href}">${choice.label}</a>`;
+                }
+                return `<button class="cyoa-btn" onclick="renderStage('${choice.next}')">${choice.label}</button>`;
+            }).join('');
+
+            container.innerHTML = `
+                <p class="cyoa-text">${stage.text}</p>
+                <div class="cyoa-choices">${choicesHTML}</div>
+            `;
+        }
+
+        renderStage('start');
+    </script>
 </body>
 </html>
