@@ -2,30 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0; url=deadpool.html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scoreboard</title>
+    <title>MGC.app | Redirecting</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="banner">
-        <a href="index.html">Home</a>
-        <a href="bounty-board.html">Bounty Board</a>
-        <a href="deadpool.html">Deadpool</a>
-    </div>
-    <div class="container">
-        <h1>Scoreboard</h1>
-        <div id="user-points" class="user-points"></div> <!-- Display user points -->
-        <div class="main-content">
-            <div id="scoreboard" class="scoreboard"></div>
-            <div class="controls">
-                <input type="text" id="player-name" placeholder="Player Name">
-                <button onclick="addPlayer()">Add Player</button>
+    <main id="app" class="shell" style="width:min(720px,calc(100vw - 32px));margin:40px auto;">
+        <section class="pane">
+            <div class="kicker">MGC.app</div>
+            <h1>Redirecting to Deadpool</h1>
+            <p class="card-meta">`app.html` is now a compatibility alias for the controller-first Deadpool screen.</p>
+            <div class="action-row" style="margin-top:14px;">
+                <a class="pill" href="deadpool.html">Continue to Deadpool</a>
             </div>
-            <div class="point-controls" id="point-controls">
-                <!-- Point control buttons will be dynamically inserted here -->
-            </div>
-        </div>
-    </div>
-    <script src="app.js"></script>
+        </section>
+    </main>
 </body>
 </html>

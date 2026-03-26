@@ -1,105 +1,209 @@
-// Initialize players from local storage or as an empty array
-let players = JSON.parse(localStorage.getItem('players')) || [];
-let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+(function () {
+  'use strict';
 
-// Function to add a player to the scoreboard
-function addPlayer() {
-    const playerName = document.getElementById('player-name').value;
-    if (playerName) {
-        players.push({ name: playerName, totalPoints: 0, scoreBounties: 0, scorePeerAward: 0, scoreMemelord: 0 });
-        localStorage.setItem('players', JSON.stringify(players));
-        document.getElementById('player-name').value = '';
-        updateScoreboard();
-        updatePointControls();
+  const STORAGE_KEY = 'players';
+  const CATEGORY_KEYS = ['scoreBounties', 'scorePeerAward', 'scoreMemelord'];
+
+  function readPlayers() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.map(normalizePlayer) : [];
+    } catch {
+      return [];
     }
-}
+  }
 
-// Function to update the scoreboard display
-function updateScoreboard() {
-    const scoreboard = document.getElementById('scoreboard');
-    scoreboard.innerHTML = '';
+  function savePlayers(players) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(players.map(normalizePlayer)));
+  }
 
-    // Sort players by total score (sum of all categories) in descending order
-    players.sort((a, b) => b.totalPoints - a.totalPoints);
+  function normalizePlayer(player) {
+    return {
+      name: String(player?.name || 'Unnamed'),
+      totalPoints: Number.isFinite(player?.totalPoints) ? player.totalPoints : 0,
+      scoreBounties: Number.isFinite(player?.scoreBounties) ? player.scoreBounties : 0,
+      scorePeerAward: Number.isFinite(player?.scorePeerAward) ? player.scorePeerAward : 0,
+      scoreMemelord: Number.isFinite(player?.scoreMemelord) ? player.scoreMemelord : 0,
+    };
+  }
 
-    players.forEach((player, index) => {
-        const totalScore = player.scoreBounties + player.scorePeerAward + player.scoreMemelord;
-        player.totalPoints = totalScore; // Update the total points
-        const playerElement = document.createElement('div');
-        playerElement.classList.add('player');
+  function scoreOf(player) {
+    return CATEGORY_KEYS.reduce((total, key) => total + (Number(player[key]) || 0), 0);
+  }
 
-        playerElement.innerHTML = `
-            <span>${player.name}: ${totalScore}</span>
-            <div>
-                <span>🏹 ${player.scoreBounties}</span>
-                <button onclick="incrementScore(${index}, 'scoreBounties')">+</button>
-                <button onclick="decrementScore(${index}, 'scoreBounties')">-</button>
-                <span>🃏 ${player.scoreMemelord}</span>
-                <button onclick="incrementScore(${index}, 'scoreMemelord')">+</button>
-                <button onclick="decrementScore(${index}, 'scoreMemelord')">-</button>
-            </div>
-        `;
+  function getScoreboardEl() {
+    return document.getElementById('scoreboard');
+  }
 
-        scoreboard.appendChild(playerElement);
+  function getControlsEl() {
+    return document.getElementById('point-controls');
+  }
+
+  function getNameInputEl() {
+    return document.getElementById('player-name');
+  }
+
+  let players = readPlayers();
+
+  function sync() {
+    players = players.map(normalizePlayer).sort((a, b) => scoreOf(b) - scoreOf(a));
+    players.forEach((player) => {
+      player.totalPoints = scoreOf(player);
+    });
+    savePlayers(players);
+  }
+
+  function renderUserPoints() {
+    if (typeof window.displayUserPoints === 'function') {
+      window.displayUserPoints();
+    }
+  }
+
+  function renderScoreboard() {
+    const scoreboard = getScoreboardEl();
+    if (!scoreboard) {
+      return;
+    }
+
+    sync();
+
+    if (players.length === 0) {
+      scoreboard.innerHTML = '<div class="player empty-state">No players yet. Add one to start the board.</div>';
+      renderPointControls();
+      renderUserPoints();
+      return;
+    }
+
+    scoreboard.innerHTML = players
+      .map((player, index) => {
+        return [
+          '<div class="player">',
+          `<span>${player.name}: ${player.totalPoints}</span>`,
+          '<div class="player-breakdown">',
+          `<span>🏹 ${player.scoreBounties}</span>`,
+          `<span>🤝 ${player.scorePeerAward}</span>`,
+          `<span>🃏 ${player.scoreMemelord}</span>`,
+          '</div>',
+          '<div class="player-actions">',
+          `<button type="button" data-action="score" data-index="${index}" data-category="scoreBounties" data-delta="1">+ Bounty</button>`,
+          `<button type="button" data-action="score" data-index="${index}" data-category="scorePeerAward" data-delta="1">+ Peer</button>`,
+          `<button type="button" data-action="score" data-index="${index}" data-category="scoreMemelord" data-delta="1">+ Meme</button>`,
+          '</div>',
+          '</div>',
+        ].join('');
+      })
+      .join('');
+
+    renderPointControls();
+    renderUserPoints();
+  }
+
+  function renderPointControls() {
+    const pointControls = getControlsEl();
+    if (!pointControls) {
+      return;
+    }
+
+    pointControls.innerHTML = players
+      .map((player, index) => {
+        return [
+          '<div class="player-controls">',
+          `<span>${player.name}</span>`,
+          '<div>',
+          `<span>🏹</span>`,
+          `<button type="button" data-action="score" data-index="${index}" data-category="scoreBounties" data-delta="1">+</button>`,
+          `<button type="button" data-action="score" data-index="${index}" data-category="scoreBounties" data-delta="-1">-</button>`,
+          `<span>🤝</span>`,
+          `<button type="button" data-action="score" data-index="${index}" data-category="scorePeerAward" data-delta="1">+</button>`,
+          `<button type="button" data-action="score" data-index="${index}" data-category="scorePeerAward" data-delta="-1">-</button>`,
+          `<span>🃏</span>`,
+          `<button type="button" data-action="score" data-index="${index}" data-category="scoreMemelord" data-delta="1">+</button>`,
+          `<button type="button" data-action="score" data-index="${index}" data-category="scoreMemelord" data-delta="-1">-</button>`,
+          '</div>',
+          '</div>',
+        ].join('');
+      })
+      .join('');
+  }
+
+  function addPlayer() {
+    const input = getNameInputEl();
+    if (!input) {
+      return;
+    }
+
+    const name = input.value.trim();
+    if (!name) {
+      return;
+    }
+
+    players.push({
+      name,
+      totalPoints: 0,
+      scoreBounties: 0,
+      scorePeerAward: 0,
+      scoreMemelord: 0,
     });
 
-    localStorage.setItem('players', JSON.stringify(players));
-    displayUserPoints(); // Display user points
-}
+    input.value = '';
+    renderScoreboard();
+  }
 
-// Function to update the point control buttons
-function updatePointControls() {
-    const pointControls = document.getElementById('point-controls');
-    pointControls.innerHTML = '';
-
-    players.forEach((player, index) => {
-        const playerControls = document.createElement('div');
-        playerControls.classList.add('player-controls');
-
-        playerControls.innerHTML = `
-            <span>${player.name}</span>
-            <div>
-                <span>🏹</span>
-                <button onclick="incrementScore(${index}, 'scoreBounties')">+</button>
-                <button onclick="decrementScore(${index}, 'scoreBounties')">-</button>
-                <span>🃏</span>
-                <button onclick="incrementScore(${index}, 'scoreMemelord')">+</button>
-                <button onclick="decrementScore(${index}, 'scoreMemelord')">-</button>
-            </div>
-        `;
-
-        pointControls.appendChild(playerControls);
-    });
-}
-
-// Function to increment a player's score
-function incrementScore(index, category) {
-    players[index][category]++;
-    updatePlayerTotalPoints(index); // Update the player's total points
-    localStorage.setItem('players', JSON.stringify(players));
-    updateScoreboard();
-    updatePointControls();
-}
-
-// Function to decrement a player's score
-function decrementScore(index, category) {
-    players[index][category]--;
-    updatePlayerTotalPoints(index); // Update the player's total points
-    localStorage.setItem('players', JSON.stringify(players));
-    updateScoreboard();
-    updatePointControls();
-}
-
-// Function to update a player's total points
-function updatePlayerTotalPoints(index) {
+  function changeScore(index, category, delta) {
     const player = players[index];
-    player.totalPoints = player.scoreBounties + player.scorePeerAward + player.scoreMemelord;
-    localStorage.setItem('players', JSON.stringify(players));
-}
+    if (!player || !CATEGORY_KEYS.includes(category)) {
+      return;
+    }
 
-// On page load, update the scoreboard, point controls, and display user points if on the deadpool page
-if (document.getElementById('scoreboard')) {
-    updateScoreboard();
-    updatePointControls();
-    displayUserPoints(); // Display user points
-}
+    player[category] = Math.max(0, (Number(player[category]) || 0) + delta);
+    renderScoreboard();
+  }
+
+  function handleControlsClick(event) {
+    const button = event.target.closest('button[data-action="score"]');
+    if (!button) {
+      return;
+    }
+
+    const index = Number(button.dataset.index);
+    const category = button.dataset.category;
+    const delta = Number(button.dataset.delta);
+    changeScore(index, category, delta);
+  }
+
+  function bindKeyboardShortcuts() {
+    const input = getNameInputEl();
+    if (!input) {
+      return;
+    }
+
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        addPlayer();
+      }
+    });
+  }
+
+  function init() {
+    const scoreboard = getScoreboardEl();
+    if (!scoreboard) {
+      return;
+    }
+
+    const controls = getControlsEl();
+    if (controls) {
+      controls.addEventListener('click', handleControlsClick);
+    }
+
+    window.addPlayer = addPlayer;
+    window.incrementScore = (index, category) => changeScore(index, category, 1);
+    window.decrementScore = (index, category) => changeScore(index, category, -1);
+
+    bindKeyboardShortcuts();
+    renderScoreboard();
+  }
+
+  init();
+})();

@@ -3,27 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bounty Board</title>
+    <title>MGC.app | Bounty Board</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="main.js" defer></script>
 </head>
-<body>
-    <div class="banner">
-        <a href="index.html">Home</a>
-        <a href="bounty-board.html">Bounty Board</a>
-        <a href="app.html">Deadpool</a>
-    </div>
-    <div id="user-points" class="user-points"></div> <!-- Display user points -->
-    <div class="container">
-        <h1>Bounty Board</h1>
-        <div id="bounties"></div>
-        <div class="controls">
-            <input type="text" id="bounty-description" placeholder="Bounty Description">
-            <input type="number" id="bounty-cost" placeholder="Cost">
-            <input type="number" id="bounty-reward" placeholder="Reward">
-            <button id="add-bounty-button">Add Bounty</button>
-        </div>
-        <a href="app.html">Back to Deadpool</a>
-    </div>
-    <script src="bounty.js"></script>
+<body data-page="bounty-board">
+    <main id="app"></main>
 </body>
 </html>

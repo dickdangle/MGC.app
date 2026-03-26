@@ -1,45 +1,65 @@
 # MGC.app
-wapp
-# digivice_root.sys
-# Core memory daemon for Myth.OS - the Digivice
 
-import os
-import time
-from datetime import datetime
+MGC.app is a lightweight static prototype for a deadpool and bounty-board flow.
+It is plain HTML, CSS, and JavaScript with `localStorage` for persistence. It is not a React app, and it is not a Truffle/Web3 project.
 
-# === Config ===
-THREAD_LOG = "~/digivice/threads.log"
+## Run Locally
 
-# === Helper Functions ===
-def write_thread(entry):
-    timestamp = datetime.now().isoformat()
-    log_entry = f"[{timestamp}] {entry}\n"
-    with open(os.path.expanduser(THREAD_LOG), "a") as f:
-        f.write(log_entry)
-    print(f":: Thread saved at {timestamp}")
+The simplest way to run it is as a static site:
 
-# === Boot Sequence ===
-def boot_sequence():
-    print(":: Booting digivice_root.sys...")
-    time.sleep(1)
-    write_thread("digivice_root.sys initiated - Merge active.")
-    print(":: Core memory daemon online.")
+```powershell
+python -m http.server 8000
+```
 
-# === Log Input ===
-def log_manual_entry():
-    entry = input(">> Cast your thread: ")
-    write_thread(entry)
+Then open:
 
-# === Main Loop ===
-def run():
-    boot_sequence()
-    while True:
-        log_manual_entry()
+```text
+http://localhost:8000/index.html
+```
 
-if __name__ == "__main__":
-    try:
-        run()
-    except KeyboardInterrupt:
-        print("\n:: Shutting down Digivice memory thread...")
-        write_thread("digivice_root.sys terminated - Thread suspended.")
+You can also go directly to:
 
+- `index.html`
+- `deadpool.html`
+- `bounty-board.html`
+- `login.html`
+- `signup.html`
+
+## What Is In The Repo
+
+- `index.html` is the landing page.
+- `deadpool.html` is the main scoreboard-style view.
+- `app.html` is a compatibility redirect to `deadpool.html`.
+- `bounty-board.html` is the bounty management screen.
+- `login.html` and `signup.html` are simple auth screens.
+- `styles.css` holds the shared presentation.
+- `app.js`, `deadpool.js`, `bounty.js`, and `users.js` hold the page logic.
+- `Package.json` is now just lightweight project metadata.
+
+## Current Shape
+
+The current app is deliberately simple:
+
+- user accounts and points live in `localStorage`
+- bounties and signups are stored locally
+- the scoreboard is a browser-rendered list
+- the code is intentionally static so it is easy to prototype and easy to port
+
+## How This Maps To PS2 / Free McBoot
+
+This prototype is useful because it lets us work out the structure before we commit to a PS2 runtime.
+
+The later port path should keep the same design constraints:
+
+- controller-first navigation
+- fixed screens and simple focus states
+- no dependency on typing as the main interaction
+- local state that can be serialized to a save format later
+- a menu/runtime loop that can be rewritten as a PS2 `.ELF`
+
+So the HTML version is the design sandbox, and the PS2/FMCB version becomes the controller-driven runtime.
+
+## Notes
+
+- The cleanest local workflow is to edit the HTML prototype in a browser and use the JS files as the behavior layer.
+- `app.js` is only a legacy compatibility stub now; the useful logic lives in the page-specific scripts.

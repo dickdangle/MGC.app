@@ -1,62 +1,126 @@
-// User data management
-let users = JSON.parse(localStorage.getItem('users')) || [];
-let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+(function () {
+  'use strict';
 
-// Function to signup a new user
-function signup() {
-    const username = document.getElementById('signup-username').value;
-    const password = document.getElementById('signup-password').value;
-    
-    if (username && password) {
-        const userExists = users.some(user => user.username === username);
-        
-        if (!userExists) {
-            users.push({ username, password, points: 100 }); // Initial points
-            localStorage.setItem('users', JSON.stringify(users));
-            alert('Signup successful! Please login.');
-            window.location.href = 'login.html';
-        } else {
-            alert('Username already exists. Please choose another one.');
-        }
-    } else {
-        alert('Please enter both username and password.');
+  const USERS_KEY = 'users';
+  const CURRENT_USER_KEY = 'currentUser';
+
+  function readJson(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch {
+      return fallback;
     }
-}
+  }
 
-// Function to login a user
-function login() {
-    const username = document.getElementById('login-username').value;
-    const password = document.getElementById('login-password').value;
+  function writeJson(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
 
-    const user = users.find(user => user.username === username && user.password === password);
+  function readUsers() {
+    const users = readJson(USERS_KEY, []);
+    return Array.isArray(users) ? users : [];
+  }
 
+  function currentUser() {
+    return readJson(CURRENT_USER_KEY, null);
+  }
+
+  function setCurrentUser(user) {
     if (user) {
-        currentUser = user;
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        window.location.href = 'app.html';
+      writeJson(CURRENT_USER_KEY, user);
     } else {
-        alert('Invalid username or password.');
+      localStorage.removeItem(CURRENT_USER_KEY);
     }
-}
+  }
 
-// Function to logout a user
-function logout() {
-    currentUser = null;
-    localStorage.removeItem('currentUser');
-    window.location.href = 'login.html';
-}
-
-// Function to display current user points
-function displayUserPoints() {
+  function displayUserPoints() {
     const userPointsElement = document.getElementById('user-points');
-    if (currentUser) {
-        userPointsElement.innerHTML = `Current User Points: ${currentUser.points}`;
-    } else {
-        userPointsElement.innerHTML = 'No user logged in.';
+    if (!userPointsElement) {
+      return;
     }
-}
 
-// Call displayUserPoints on page load if element exists
-if (document.getElementById('user-points')) {
+    const user = currentUser();
+    userPointsElement.textContent = user
+      ? `Current User Points: ${user.points}`
+      : 'No user logged in.';
+  }
+
+  function signup() {
+    const username = document.getElementById('signup-username')?.value.trim();
+    const password = document.getElementById('signup-password')?.value;
+    const users = readUsers();
+
+    if (!username || !password) {
+      alert('Please enter both username and password.');
+      return;
+    }
+
+    if (users.some((user) => user.username === username)) {
+      alert('Username already exists. Please choose another one.');
+      return;
+    }
+
+    users.push({
+      username,
+      password,
+      points: 100,
+    });
+
+    writeJson(USERS_KEY, users);
+    alert('Signup successful! Please login.');
+    window.location.href = 'login.html';
+  }
+
+  function login() {
+    const username = document.getElementById('login-username')?.value.trim();
+    const password = document.getElementById('login-password')?.value;
+    const users = readUsers();
+    const user = users.find((entry) => entry.username === username && entry.password === password);
+
+    if (!user) {
+      alert('Invalid username or password.');
+      return;
+    }
+
+    setCurrentUser(user);
+    window.location.href = 'deadpool.html';
+  }
+
+  function logout() {
+    setCurrentUser(null);
+    window.location.href = 'login.html';
+  }
+
+  function bindKeyboardShortcuts() {
+    const loginPassword = document.getElementById('login-password');
+    const signupPassword = document.getElementById('signup-password');
+
+    [loginPassword, signupPassword].filter(Boolean).forEach((input) => {
+      input.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter') {
+          return;
+        }
+
+        event.preventDefault();
+        if (input.id === 'login-password') {
+          login();
+        } else {
+          signup();
+        }
+      });
+    });
+  }
+
+  function init() {
+    window.signup = signup;
+    window.login = login;
+    window.logout = logout;
+    window.displayUserPoints = displayUserPoints;
+
+    bindKeyboardShortcuts();
     displayUserPoints();
-}
+  }
+
+  init();
+})();
